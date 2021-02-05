@@ -23,4 +23,4 @@ Imports:
     GenomicRanges,
     S4Vectors,
     scales
-RoxygenNote: 7.0.0
+RoxygenNote: 7.1.1
