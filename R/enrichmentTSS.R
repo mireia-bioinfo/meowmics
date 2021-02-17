@@ -4,24 +4,28 @@
 #' @param promoter_saf SAF promoter file generated with \code{binPromoterAnnotation}.
 #' @param suffix Suffix to remove from bam files to use as sample names. Default: ".bam".
 #' @param nthreads Number of cores to use for the analysis.
+#' @param paired_end Logical indicating whether the libraries are paired end or not. (Default: FALSE).
 #' @return Data.frame with the different promoter bins and the mean reads per sample
 #' @export
 enrichmentTSS <- function(bam_files,
                           promoter_saf,
                           suffix=".bam",
-                          nthreads = 5) {
+                          nthreads = 5,
+                          paired_end = FALSE) {
+
   ## Obtain counts in binned promoters
-  counts <- Rsubread::featureCounts(files,
+  counts <- Rsubread::featureCounts(bam_files,
                                     annot.ext = promoter_saf,
                                     allowMultiOverlap = TRUE,
-                                    nthreads = nthreads)
+                                    nthreads = nthreads,
+                                    isPairedEnd = paired_end)
 
-  names <- getNameFromPath(files, suffix=suffix)
+  names <- getNameFromPath(bam_files, suffix=suffix)
   colnames(counts$counts) <- names
   colnames(counts$stat) <- c("Status", names)
 
   ## Join counts and create long df
-  anno <- cbind(saf, counts$counts)
+  anno <- cbind(promoter_saf, counts$counts)
   anno.m <- reshape2::melt(anno,
                            id.vars=1:7,
                            value.vars=8:ncol(anno),
@@ -33,8 +37,8 @@ enrichmentTSS <- function(bam_files,
 
   ## Get mean promoter enrichment for each sample
   tss <- anno.m %>%
-    group_by(sample, Position) %>%
-    summarise(mean=mean(reads),
+    dplyr::group_by(sample, Position) %>%
+    dplyr::summarise(mean=mean(reads),
               sd=sd(reads),
               median=median(reads),
               mad=mad(reads))

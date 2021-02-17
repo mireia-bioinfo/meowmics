@@ -16,15 +16,22 @@ signalToNoiseRatio <- function(bam_file,
                                suffix=".bam",
                                TxDb,
                                promoter_dist=2e3,
-                               nthreads=5) {
+                               nthreads=5,
+                               paired_end = FALSE) {
   name <- getNameFromPath(bam_file, suffix=suffix)
   ## Load and annotate peaks as promoter/distal
-  peaks <- rtracklayer::import(peak_file)
+  if (is(peak_file, "character")) {
+    peaks <- rtracklayer::import(peak_file)
+  } else if (is(peak_file, "GRanges")) {
+    peaks <- peak_file
+  }
+
+  if (length(unique(mcols(peaks)[,1]))!=length(peaks)) stop("First mcol should be a unique identifier.")
 
   peaks$distanceToTSS <- mcols(distanceToNearest(peaks, promoters(TxDb),
                                                  ignore.strand = TRUE))$distance
   peaks$annotation <- "Promoter"
-  peaks$annotation[abs(anno$distanceToTSS)>promoter_dist] <- "Distal"
+  peaks$annotation[abs(peaks$distanceToTSS)>promoter_dist] <- "Distal"
 
   ## Convert to SAF
   peaks <- data.frame(peaks)
@@ -35,7 +42,8 @@ signalToNoiseRatio <- function(bam_file,
   ## Obtain counts
   counts <- Rsubread::featureCounts(bam_file,
                                     annot.ext=saf,
-                                    nthreads=nthreads)
+                                    nthreads=nthreads,
+                                    isPairedEnd = paired_end)
   anno <- cbind(saf, counts$counts)
   colnames(anno)[ncol(anno)] <- "reads"
 

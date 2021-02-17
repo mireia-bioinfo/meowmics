@@ -4,7 +4,13 @@
 \alias{enrichmentTSS}
 \title{Get TSS enrichment}
 \usage{
-enrichmentTSS(bam_files, promoter_saf, suffix = ".bam", nthreads = 5)
+enrichmentTSS(
+  bam_files,
+  promoter_saf,
+  suffix = ".bam",
+  nthreads = 5,
+  paired_end = FALSE
+)
 }
 \arguments{
 \item{bam_files}{Character vector of BAM files to obtain enrichment.}
@@ -14,6 +20,8 @@ enrichmentTSS(bam_files, promoter_saf, suffix = ".bam", nthreads = 5)
 \item{suffix}{Suffix to remove from bam files to use as sample names. Default: ".bam".}
 
 \item{nthreads}{Number of cores to use for the analysis.}
+
+\item{paired_end}{Logical indicating whether the libraries are paired end or not. (Default: FALSE).}
 }
 \value{
 Data.frame with the different promoter bins and the mean reads per sample
