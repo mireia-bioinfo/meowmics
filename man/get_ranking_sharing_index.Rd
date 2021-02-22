@@ -7,7 +7,7 @@
 get_ranking_sharing_index(
   peak_files,
   bam_files,
-  filename = "master_sharing_ranking_index.rda",
+  filename = "master_sharing_ranking_index.rds",
   perc_overlap,
   TxDb = TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene,
   nthreads = 2

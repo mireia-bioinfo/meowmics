@@ -13,7 +13,7 @@
 #' @export
 get_ranking_sharing_index <- function(peak_files,
                                       bam_files,
-                                      filename="master_sharing_ranking_index.rda",
+                                      filename="master_sharing_ranking_index.rds",
                                       perc_overlap,
                                       TxDb=TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene,
                                       nthreads=2) {
@@ -36,7 +36,7 @@ get_ranking_sharing_index <- function(peak_files,
   master$annotation <- "Distal"
   master$annotation[abs(master$distanceToTSS)<=2e3] <- "Promoter"
 
-  save(master, file=filename)
+  saveRDS(master, file=filename)
   return(master)
 }
 

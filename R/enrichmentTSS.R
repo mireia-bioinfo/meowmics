@@ -54,7 +54,7 @@ enrichmentTSS <- function(bam_files,
 #' @param bin Integer indicating the size of the bins. Default: 10 bp.
 #' @param build Name of the build to use to extract promoter coordinates. Can be
 #' either hg38 (default) or hg19.
-#' @param out_format
+#' @param out_format Output format, either "saf" or "granges".
 #' @return Either a SAF of GRanges containing binned promoter regions.
 #' @import GenomicRanges
 #' @export

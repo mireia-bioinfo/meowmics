@@ -10,7 +10,8 @@ signalToNoiseRatio(
   suffix = ".bam",
   TxDb,
   promoter_dist = 2000,
-  nthreads = 5
+  nthreads = 5,
+  paired_end = FALSE
 )
 }
 \arguments{

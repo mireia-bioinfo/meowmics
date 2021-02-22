@@ -20,6 +20,8 @@ Default: 2Kb.}
 
 \item{build}{Name of the build to use to extract promoter coordinates. Can be
 either hg38 (default) or hg19.}
+
+\item{out_format}{Output format, either "saf" or "granges".}
 }
 \value{
 Either a SAF of GRanges containing binned promoter regions.
