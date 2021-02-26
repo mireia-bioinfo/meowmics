@@ -5,7 +5,6 @@
 #' @param suffix Suffix to remove from bam files to use as sample names. Default: ".bam".
 #' @param nthreads Number of cores to use for the analysis.
 #' @param paired_end Logical indicating whether the libraries are paired end or not. (Default: FALSE).
-#' @param
 #' @export
 wholeGenomeCor <- function(bam_files,
                            chr_sizes,
@@ -23,6 +22,7 @@ wholeGenomeCor <- function(bam_files,
                                     allowMultiOverlap = TRUE,
                                     nthreads = nthreads,
                                     isPairedEnd = paired_end)
+  colnames(counts$counts) <- gsub(suffix, "", colnames(counts$counts))
 
   ## Obtain correlation matrix
   cormat <- cor(counts$counts)

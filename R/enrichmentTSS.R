@@ -72,27 +72,7 @@ binPromoterAnnotation <- function(scope=2e3,
   }
 
   ## Obtain gene annotation
-  mart <- biomaRt::useMart(biomart="ENSEMBL_MART_ENSEMBL",
-                           host=host,
-                           path="/biomart/martservice",
-                           dataset="hsapiens_gene_ensembl")
-  genes <- biomaRt::getBM(attributes=c("chromosome_name", "start_position", "end_position",
-                                       "strand", "ensembl_gene_id", "external_gene_name"),
-                          filters="biotype", values="protein_coding",
-                          mart=mart)
-
-  genes$strand[genes$strand==-1] <- "-"
-  genes$strand[genes$strand==1] <- "+"
-
-  genes <- regioneR::toGRanges(genes)
-  strand(genes) <- genes$strand
-  mcols(genes) <- mcols(genes)[,-1]
-
-  genes <- GenomeInfoDb::keepStandardChromosomes(genes, pruning.mode = "coarse")
-  genes <- GenomeInfoDb::dropSeqlevels(genes, "MT", pruning.mode = "coarse")
-
-  if (!grepl("grch", build))   GenomeInfoDb::seqlevelsStyle(genes) <- "UCSC"
-
+  genes <- obtainCodingGenes(build=build)
   genes$GeneID <- genes$ensembl_gene_id
 
   # Extend regions to scope*2

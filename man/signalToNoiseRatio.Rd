@@ -8,7 +8,7 @@ signalToNoiseRatio(
   bam_file,
   peak_file,
   suffix = ".bam",
-  TxDb,
+  build = "hg38",
   promoter_dist = 2000,
   nthreads = 5,
   paired_end = FALSE
@@ -21,7 +21,8 @@ signalToNoiseRatio(
 
 \item{suffix}{Suffix to remove from the bam_file to generate the sample name.}
 
-\item{TxDb}{TxDb object to extract gene annotation from.}
+\item{build}{Name of the build to use to extract promoter coordinates. Can be
+either hg38 (default) or hg19.}
 
 \item{promoter_dist}{Distance from TSS to classify promoter and distal regions.}
 
