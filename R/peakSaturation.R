@@ -1,30 +1,19 @@
-peakfiles <- list.files("data/H3K27ac/Peaks/", pattern="NET.*.broadPeak", full.names=TRUE)
-title <- "Saturation"
-fc = NA
-qval =NA
-comp = "bp"
-xlab="# of samples"
-suffix="_peaks.broadPeak"
-
 #' Peak saturation with increasing number of samples
 #'
-#' @param peakfiles
-#' @param title
-#' @param fc
-#' @param qval
-#' @param comp
-#' @param xlab
-#' @param suffix
+#' @param peakfiles Character vector of peak file paths or list of GRanges object
+#' containing the peaks for each one of the different samples.
+#' @param fc Numeric indicating a fold-change value to filter out peaks (from column
+#' named "signalValue").
+#' @param qval Numeric indicating a q-value threshold to filter out peaks (from column
+#' named "qValue").
+#' @param suffix Suffix to remove from the file paths to create sample names.
 #'
 #' @import GenomicRanges
 #' @import ggplot2
 #' @export
 peakSaturation <- function(peakfiles,
-                           title,
                            fc=NA,
                            qval=NA,
-                           comp="peaks", # or bp
-                           xlab="# of samples",
                            suffix="_peaks.narrowPeak") {
   if (is.character(peakfiles)) {
     names <- gsub(suffix, "", basename(peakfiles))
@@ -32,45 +21,36 @@ peakSaturation <- function(peakfiles,
     gr <- GRangesList(lapply(peakfiles, rtracklayer::import))
     names(gr) <- names
 
-    if (!is.na(fc)) {
-      gr <- lapply(gr,
-                   function(x) x[x$signalValue>fc,])
-    }
-
-    if (!is.na(qval)) {
-      gr <- lapply(gr,
-                   function(x) x[x$qValue>=qval,])
-    }
-
-    gr <- GRangesList(gr)
   } else {
     gr <- GRangesList(peakfiles)
   }
 
+  if (!is.na(fc)) gr <- GRangesList(lapply(gr, function(x) x[x$signalValue>fc,]))
+
+  if (!is.na(qval)) gr <- GRangesList(lapply(gr, function(x) x[x$qValue>=qval,]))
+
+  ## Obtain all possible combinations
   comb <- sapply(1:length(gr),
                  function(x) utils::combn(names(gr), m=x))
 
+  ## Obtain overlapping peaks & bp covered
   comb.df.all <- data.frame()
   for (l in 1:length(comb)) {
-    for (c in 1:ncol(comb[[l]])) {
-      ## TODO Try parallelizing this section!!
-      samples <- comb[[l]][,c]
+    message("Calculating combinations of ", l, " samples")
 
-      # Merge regions
-      sel <- gr[names(gr) %in% samples]
-      sel <- unlist(sel)
-      sel <- regioneR::joinRegions(sel)
-
-      # DF
-      comb.df <- data.frame(num_samples=as.factor(l),
-                            id_samples=paste0(samples, collapse=" "),
-                            num_peaks=length(sel),
-                            bp_covered=sum(width(sel)))
-      comb.df.all <- rbind(comb.df.all, comb.df)
-    }
+    tictoc::tic()
+    ## TODO: This is not working when calling the package ???
+    ## first error: error in evaluating the argument 'x' in selecting a method for function 'as.factor': 'l'
+    rows <- BiocParallel::bplapply(1:ncol(comb[[l]]),
+                                   function(x) .obtainOverlapMeasures(gr = gr,
+                                                                      samples = comb[[l]][,x])
+                                   )
+    rows_df <- do.call(rbind, rows)
+    comb.df.all <- rbind(comb.df.all, rows_df)
+    tictoc::toc()
   }
 
-
+  ## Summarize stats
   stats <- comb.df.all %>%
     dplyr::group_by(num_samples) %>%
     dplyr::summarise(mean.peaks=mean(num_peaks),
@@ -81,6 +61,41 @@ peakSaturation <- function(peakfiles,
   res <- list(df=comb.df.all,
               stats=stats)
 
+  return(res)
+}
+
+#' Obtain number of overlaps and width of the overlapping regions
+#'
+#' @param gr GRangesList with the peaks for each of the different samples.
+#' @param samples Name of the samples (should be names in the GRangesList object)
+#' to collapse together.
+.obtainOverlapMeasures <- function(gr, samples) {
+  # Merge regions
+  sel <- gr[names(gr) %in% samples]
+  sel <- unlist(sel)
+  sel <- regioneR::joinRegions(sel)
+
+  # DF
+  comb.df <- data.frame(num_samples=as.factor(l),
+                        id_samples=paste0(samples, collapse=" "),
+                        num_peaks=length(sel),
+                        bp_covered=sum(width(sel)))
+
+  return(comb.df)
+}
+
+#' Plot peak saturation
+#'
+#' @param res Results of the \code{peakSaturation} function.
+#' @param comp Name of the comparison to plot. It can be either "peaks" (default),
+#' which will plot the number of overlapping peaks or "bp" which will overlap the
+#' number of overlapping bp.
+#' @param title Character with the title of the plot
+#' @param xlab Label for the x axis.
+plotPeakSaturation <- function(res,
+                               comp="peaks", #or bp
+                               title,
+                               xlab="# of samples") {
   if (comp=="peaks") {
     yaxis <- "mean.peaks"
     ymin <- res$stats$mean.peaks - res$stats$sd.peaks
@@ -103,7 +118,7 @@ peakSaturation <- function(peakfiles,
     geom_jitter(data=res$df,
                 aes_string(num_samples, dots,
                            fill=num_samples), width=0.1, pch=21,
-                color="black", size=2) +
+                color="black", size=2, alpha=0.5) +
     geom_pointrange(data=res$stats,
                     aes_string(x=num_samples, y=yaxis, ymin=ymin, ymax=ymax),
                     size=1) +
