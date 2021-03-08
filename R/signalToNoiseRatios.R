@@ -83,7 +83,7 @@ obtainCodingGenes <- function(build="hg38") {
                            dataset="hsapiens_gene_ensembl")
   genes <- biomaRt::getBM(attributes=c("chromosome_name", "start_position", "end_position",
                                        "strand", "ensembl_gene_id", "external_gene_name"),
-                          filters="biotype", values="protein_coding",
+                          filters="biotype", values="protein_coding", useCache = FALSE,
                           mart=mart)
 
   genes$strand[genes$strand==-1] <- "-"

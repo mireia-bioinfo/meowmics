@@ -9,7 +9,6 @@
 #' @param suffix Suffix to remove from the file paths to create sample names.
 #'
 #' @import GenomicRanges
-#' @import ggplot2
 #' @export
 peakSaturation <- function(peakfiles,
                            fc=NA,
@@ -92,6 +91,8 @@ peakSaturation <- function(peakfiles,
 #' number of overlapping bp.
 #' @param title Character with the title of the plot
 #' @param xlab Label for the x axis.
+#' @import ggplot2
+#' @export
 plotPeakSaturation <- function(res,
                                comp="peaks", #or bp
                                title,
