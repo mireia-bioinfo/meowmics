@@ -34,16 +34,16 @@ peakSaturation <- function(peakfiles,
 
   ## Obtain overlapping peaks & bp covered
   comb.df.all <- data.frame()
-  for (l in 1:length(comb)) {
-    message("Calculating combinations of ", l, " samples")
+  for (i in 1:length(comb)) {
+    message("Calculating combinations of ", i, " samples")
 
     tictoc::tic()
-    ## TODO: This is not working when calling the package ???
-    ## first error: error in evaluating the argument 'x' in selecting a method for function 'as.factor': 'l'
-    rows <- BiocParallel::bplapply(1:ncol(comb[[l]]),
-                                   function(x) .obtainOverlapMeasures(gr = gr,
-                                                                      samples = comb[[l]][,x])
+    rows <- BiocParallel::bplapply(1:ncol(comb[[i]]),
+                                   function(j) .obtainOverlapMeasures(gr = gr,
+                                                                      samples = comb[[i]][,j],
+                                                                      num_samples = i)
                                    )
+
     rows_df <- do.call(rbind, rows)
     comb.df.all <- rbind(comb.df.all, rows_df)
     tictoc::toc()
@@ -68,14 +68,14 @@ peakSaturation <- function(peakfiles,
 #' @param gr GRangesList with the peaks for each of the different samples.
 #' @param samples Name of the samples (should be names in the GRangesList object)
 #' to collapse together.
-.obtainOverlapMeasures <- function(gr, samples) {
+.obtainOverlapMeasures <- function(gr, samples, num_samples) {
   # Merge regions
   sel <- gr[names(gr) %in% samples]
   sel <- unlist(sel)
   sel <- regioneR::joinRegions(sel)
 
   # DF
-  comb.df <- data.frame(num_samples=as.factor(l),
+  comb.df <- data.frame(num_samples=as.factor(num_samples),
                         id_samples=paste0(samples, collapse=" "),
                         num_peaks=length(sel),
                         bp_covered=sum(width(sel)))
