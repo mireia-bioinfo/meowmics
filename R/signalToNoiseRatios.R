@@ -1,9 +1,12 @@
 #' Signal-to-noise ratio
 #'
-#' Given a bam file and peak file, it calculated the signal-to-ratio, that is
+#' Given a bam file and peak file, it calculates the signal-to-ratio, that is,
 #' the percentage of reads present in called peaks.
 #' @param bam_file Character with the path of the BAM file.
 #' @param peak_file Character with the path of the peak file.
+#' @param genes Data.frame containing the coding genes to use as annotation,
+#' as outputed by the function \code{\link{obtainCodingGenes}}. If set to NULL
+#' (default) it will run the function to recover coding genes.
 #' @param suffix Suffix to remove from the bam_file to generate the sample name.
 #' @param build Name of the build to use to extract promoter coordinates. Can be
 #' either hg38 (default) or hg19.
@@ -14,6 +17,7 @@
 #' @export
 signalToNoiseRatio <- function(bam_file,
                                peak_file,
+                               genes = NULL,
                                suffix=".bam",
                                build="hg38",
                                promoter_dist=2e3,
@@ -29,7 +33,7 @@ signalToNoiseRatio <- function(bam_file,
 
   if (length(unique(mcols(peaks)[,1]))!=length(peaks)) stop("First mcol should be a unique identifier.")
 
-  genes <- obtainCodingGenes(build=build)
+  if (is.null(genes)) genes <- obtainCodingGenes(build=build)
   peaks$distanceToTSS <- mcols(distanceToNearest(peaks, promoters(genes, upstream=0, downstream=1),
                                                  ignore.strand = TRUE))$distance
   peaks$annotation <- "Promoter"
@@ -62,9 +66,12 @@ signalToNoiseRatio <- function(bam_file,
 }
 
 #' Obtain protein coding genes
+#'
+#' Obtains a list of protein coding genes from the human builds (hg38 or hg19).
 #' @param build Name of the build to use to extract promoter coordinates. Can be
 #' either hg38 (default) or hg19.
-#'
+#' @return Data.frame with the coordinates, strand, ensembl_gene_id and
+#' external_gene_name of protein coding genes.#'
 #' @export
 obtainCodingGenes <- function(build="hg38") {
   ## Select build

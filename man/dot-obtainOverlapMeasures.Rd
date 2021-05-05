@@ -4,7 +4,7 @@
 \alias{.obtainOverlapMeasures}
 \title{Obtain number of overlaps and width of the overlapping regions}
 \usage{
-.obtainOverlapMeasures(gr, samples)
+.obtainOverlapMeasures(gr, samples, num_samples)
 }
 \arguments{
 \item{gr}{GRangesList with the peaks for each of the different samples.}

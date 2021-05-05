@@ -10,6 +10,10 @@ obtainCodingGenes(build = "hg38")
 \item{build}{Name of the build to use to extract promoter coordinates. Can be
 either hg38 (default) or hg19.}
 }
+\value{
+Data.frame with the coordinates, strand, ensembl_gene_id and
+external_gene_name of protein coding genes.#'
+}
 \description{
-Obtain protein coding genes
+Obtains a list of protein coding genes from the human builds (hg38 or hg19).
 }
