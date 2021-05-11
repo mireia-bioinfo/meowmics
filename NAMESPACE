@@ -2,6 +2,7 @@
 
 export("%>%")
 export(binPromoterAnnotation)
+export(binRegions)
 export(enrichmentTSS)
 export(getNameFromPath)
 export(get_conservation_scores)

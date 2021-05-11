@@ -99,6 +99,7 @@ binPromoterAnnotation <- function(scope=2e3,
 #' the first mcol contained the unique identifier of the region.
 #' @inheritParams binPromoterAnnotation
 #' @return Binned GRanges object.
+#' @export
 binRegions <- function(regions,
                        scope=2e3,
                        bin=10) {
