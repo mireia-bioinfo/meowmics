@@ -38,7 +38,7 @@ get_conservation_scores <- function(peak_file,
   peaks_unl$pos <- rep(pos, length(peaks_bin))
 
   scores <- GenomicScores::gscores(cons_score,
-                                   peaks_unl[1:1e4,],
+                                   peaks_unl,
                                    summaryFun=merge_fun)
 
   if (random_control) {
