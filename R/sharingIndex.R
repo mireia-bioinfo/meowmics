@@ -170,7 +170,7 @@ get_overlaps_sign <- function(gr_list, master, perc_overlap=0.4) {
 plot_ranking_sharing_index <- function(master,
                                        plot_title) {
 
-  if(is.character(master)) load(master)
+  if(is.character(master)) master <- readRDS(master)
 
   ## Convert data for plotting
   data <- data.frame(mcols(master))
