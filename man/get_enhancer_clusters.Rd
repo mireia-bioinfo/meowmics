@@ -9,7 +9,8 @@ get_enhancer_clusters(
   n_sites = 3,
   iterations = 500,
   percentile = 0.25,
-  genome = "hg38"
+  genome = "hg38",
+  rm = c("chrX", "chrY")
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ get_enhancer_clusters(
 \item{percentile}{Percentile of random distances to use for stitching peaks into the same cluster. Default: 0.25.}
 
 \item{genome}{Character indicating the name of the genome to use. Default: hg38.}
+
+\item{rm}{Names of chromosomes to remove. Default: chrX and chrY.}
 }
 \value{
 GRanges object containing the coordinates for the enhancer clusters

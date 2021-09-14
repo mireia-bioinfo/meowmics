@@ -6,6 +6,7 @@
 #' @param iterations Number of iterations for obtaining distance cutoff.
 #' @param percentile Percentile of random distances to use for stitching peaks into the same cluster. Default: 0.25.
 #' @param genome Character indicating the name of the genome to use. Default: hg38.
+#' @param rm Names of chromosomes to remove. Default: chrX and chrY.
 #' @export
 #' @details To define enhancer clusters, input sites are first randomized \code{iterations}
 #' times over the \code{genome} over idividual chromosomes). Then the \code{percentile}
@@ -19,11 +20,13 @@
 #'     \item{n_sites}{Number of sites in \code{gr} that are included in that specific cluster.}
 #'     \item{distance_cutoff}{Distance used as cutoff for including regions in the same cluster.}
 #' }
-get_enhancer_clusters <- function(gr, n_sites=3, iterations=500, percentile=0.25, genome="hg38") {
+get_enhancer_clusters <- function(gr, n_sites=3, iterations=500, percentile=0.25, genome="hg38",
+                                  rm=c("chrX", "chrY")) {
 
   if (is(gr, "character")) gr <- rtracklayer::import(gr)
 
   gr <- gr[order(gr)]
+  gr <- dropSeqlevels(gr, rm, pruning.mode = "coarse")
 
   # 1) Randomize candidate enhancers + Calcuate 'percentile' of inter-site distances
   rndm_dist_chr <- BiocParallel::bplapply(as.character(unique(seqnames(gr))),
@@ -41,7 +44,7 @@ get_enhancer_clusters <- function(gr, n_sites=3, iterations=500, percentile=0.25
   distances <- split(interSiteDistances(gr), seqnames(gr))
 
   # 4) Create clusters while distances are shorter than cutoff
-  clusters_list <- BiocParallel::bplapply(1:length(distances), function(i) {
+  clusters_list <- BiocParallel::bplapply(1:(length(distances)-1), function(i) {
     cluster <- cumsum(c(1, as.numeric(!(distances[[i]] < cutoff[[i]]))))
     gr_clust <- split(gr[seqnames(gr)==unique(seqnames(gr))[i]], cluster)
     num_sites <- sapply(gr_clust, length)
