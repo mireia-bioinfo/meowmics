@@ -15,18 +15,22 @@ phantomPeakQC <- function(bam_file,
                           nthreads=5) {
   name <- getNameFromPath(bam_file, suffix=suffix)
 
-  ## Run Phantom Peak QC
-  tmp <- tempdir()
-  cmd <- paste(path_phantom,
-               paste0("-c='", bam_file, "'"),
-               paste0("-p=", nthreads),
-               "-savp -rf",
-               paste0("-odir='", out_dir, "'"),
-               paste0("-out='", file.path(out_dir, paste0(name, ".txt'"))))
-  system(cmd)
+  out_ppqc <- file.path(out_dir, paste0(name, ".txt"))
+
+  if(!file.exists(out_ppqc)) {
+    ## Run Phantom Peak QC
+    tmp <- tempdir()
+    cmd <- paste(path_phantom,
+                 paste0("-c='", bam_file, "'"),
+                 paste0("-p=", nthreads),
+                 "-savp -rf",
+                 paste0("-odir='", out_dir, "'"),
+                 paste0("-out='", file.path(out_dir, paste0(name, ".txt'"))))
+    system(cmd)
+  }
 
   ## Load files
-  txt <- loadPhantomPeakQC(file_path=file.path(out_dir, paste0(name, ".txt")),
+  txt <- loadPhantomPeakQC(file_path=out_ppqc,
                              suffix = suffix)
 
   return(txt)
