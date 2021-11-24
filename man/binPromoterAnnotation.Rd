@@ -8,7 +8,8 @@ binPromoterAnnotation(
   scope = 2000,
   bin = 10,
   build = "hg38",
-  out_format = "saf"
+  out_format = "saf",
+  genes = NULL
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ Default: 2Kb.}
 either hg38 (default) or hg19.}
 
 \item{out_format}{Output format, either "saf" or "granges".}
+
+\item{genes}{Genes, as outputed by `obtainCodingGenes`.}
 }
 \value{
 Either a SAF of GRanges containing binned promoter regions.

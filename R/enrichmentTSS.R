@@ -55,13 +55,15 @@ enrichmentTSS <- function(bam_files,
 #' @param build Name of the build to use to extract promoter coordinates. Can be
 #' either hg38 (default) or hg19.
 #' @param out_format Output format, either "saf" or "granges".
+#' @param genes Genes, as outputed by `obtainCodingGenes`.
 #' @return Either a SAF of GRanges containing binned promoter regions.
 #' @import GenomicRanges
 #' @export
 binPromoterAnnotation <- function(scope=2e3,
                                   bin=10,
                                   build="hg38",
-                                  out_format="saf") {
+                                  out_format="saf",
+                                  genes=NULL) {
   ## Select build
   if(tolower(build) %in% c("hg19", "grch37")) {
     host <- "grch37.ensembl.org"
@@ -72,7 +74,7 @@ binPromoterAnnotation <- function(scope=2e3,
   }
 
   ## Obtain gene annotation
-  genes <- obtainCodingGenes(build=build)
+  if (is.null(genes)) genes <- obtainCodingGenes(build=build)
   genes$GeneID <- genes$ensembl_gene_id
 
   # Extend regions to scope*2
