@@ -23,6 +23,9 @@ enrichmentTSS <- function(bam_files,
   names <- getNameFromPath(bam_files, suffix=suffix)
   colnames(counts$counts) <- names
   colnames(counts$stat) <- c("Status", names)
+  total_reads <- colSums(counts$stat[,-1])
+  assigned_reads <- as.numeric(counts$stat[counts$stat$Status=="Assigned",-1])
+  names(assigned_reads) <- names(total_reads)
 
   ## Join counts and create long df
   anno <- cbind(promoter_saf, counts$counts)
@@ -37,11 +40,15 @@ enrichmentTSS <- function(bam_files,
 
   ## Get mean promoter enrichment for each sample
   tss <- anno.m %>%
-    dplyr::group_by(sample, Position) %>%
-    dplyr::summarise(mean=mean(reads),
-              sd=sd(reads),
-              median=median(reads),
-              mad=mad(reads))
+    dplyr::left_join(tibble::rownames_to_column(data.frame(total_reads)),
+                     by=c(sample="rowname")) %>%
+    dplyr::left_join(tibble::rownames_to_column(data.frame(assigned_reads)),
+                     by=c(sample="rowname")) %>%
+    dplyr::group_by(sample, Position, total_reads, assigned_reads) %>%
+    dplyr::summarise(mean=mean(reads*1e7/assigned_reads),
+              sd=sd(reads*1e7/assigned_reads),
+              median=median(reads*1e7/assigned_reads),
+              mad=mad(reads*1e7/assigned_reads))
 
   return(tss)
 }
