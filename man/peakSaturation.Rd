@@ -4,7 +4,13 @@
 \alias{peakSaturation}
 \title{Peak saturation with increasing number of samples}
 \usage{
-peakSaturation(peakfiles, fc = NA, qval = NA, suffix = "_peaks.narrowPeak")
+peakSaturation(
+  peakfiles,
+  fc = NA,
+  qval = NA,
+  suffix = "_peaks.narrowPeak",
+  cores = 8
+)
 }
 \arguments{
 \item{peakfiles}{Character vector of peak file paths or list of GRanges object
@@ -17,6 +23,8 @@ named "signalValue").}
 named "qValue").}
 
 \item{suffix}{Suffix to remove from the file paths to create sample names.}
+
+\item{cores}{Number of threads to use for obtaining overlaps.}
 }
 \description{
 Peak saturation with increasing number of samples

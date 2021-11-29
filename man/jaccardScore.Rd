@@ -4,10 +4,12 @@
 \alias{jaccardScore}
 \title{Calculate Jaccard Scores between a list of peaks}
 \usage{
-jaccardScore(peaks)
+jaccardScore(peaks, cores = 8)
 }
 \arguments{
 \item{peaks}{List of GRanges objects representing different sets of peaks.}
+
+\item{cores}{Number of threads to use for obtaining overlaps.}
 }
 \value{
 A data.frame containing the different comparisons between peaks and

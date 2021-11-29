@@ -7,13 +7,14 @@
 #' @param qval Numeric indicating a q-value threshold to filter out peaks (from column
 #' named "qValue").
 #' @param suffix Suffix to remove from the file paths to create sample names.
-#'
+#' @param cores Number of threads to use for obtaining overlaps.
 #' @import GenomicRanges
 #' @export
 peakSaturation <- function(peakfiles,
                            fc=NA,
                            qval=NA,
-                           suffix="_peaks.narrowPeak") {
+                           suffix="_peaks.narrowPeak",
+                           cores=8) {
   if (is.character(peakfiles)) {
     names <- gsub(suffix, "", basename(peakfiles))
 
@@ -41,7 +42,8 @@ peakSaturation <- function(peakfiles,
     rows <- BiocParallel::bplapply(1:ncol(comb[[i]]),
                                    function(j) .obtainOverlapMeasures(gr = gr,
                                                                       samples = comb[[i]][,j],
-                                                                      num_samples = i)
+                                                                      num_samples = i),
+                                   BPPARAM=BiocParallel::MulticoreParam(cores)
                                    )
 
     rows_df <- do.call(rbind, rows)
