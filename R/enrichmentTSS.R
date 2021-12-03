@@ -62,7 +62,9 @@ enrichmentTSS <- function(bam_files,
 #' @param build Name of the build to use to extract promoter coordinates. Can be
 #' either hg38 (default) or hg19.
 #' @param out_format Output format, either "saf" or "granges".
-#' @param genes Genes, as outputed by `obtainCodingGenes`.
+#' @param genes Genes, as outputed by `obtainCodingGenes`, that is: a `GRanges`
+#' object with one `mcol` named `GeneID` which is a unique identifyer for the
+#' region.
 #' @return Either a SAF of GRanges containing binned promoter regions.
 #' @import GenomicRanges
 #' @export
@@ -82,7 +84,7 @@ binPromoterAnnotation <- function(scope=2e3,
 
   ## Obtain gene annotation
   if (is.null(genes)) genes <- obtainCodingGenes(build=build)
-  genes$GeneID <- genes$ensembl_gene_id
+  if (!grepl("GeneID", colnames(mcols(genes)))) genes$GeneID <- genes$ensembl_gene_id
 
   # Extend regions to scope*2
   regions <- unique(promoters(genes, upstream=0, downstream=1))
@@ -100,7 +102,6 @@ binPromoterAnnotation <- function(scope=2e3,
     return(regions.bin)
   }
 }
-
 
 #' Bin a set of GRanges regions
 #'
