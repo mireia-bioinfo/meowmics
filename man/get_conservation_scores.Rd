@@ -6,17 +6,21 @@
 \usage{
 get_conservation_scores(
   peak_file,
+  id_col = 1,
   cons_score = phastCons7way.UCSC.hg38::phastCons7way.UCSC.hg38,
   bin_width = 20,
   window_width = 2000,
   merge_fun = "mean",
   random_control = TRUE,
   genome = "hg38",
-  per.chromosome = FALSE
+  per.chromosome = FALSE,
+  summarise = TRUE
 )
 }
 \arguments{
 \item{peak_file}{Path for the peak file or GRanges object.}
+
+\item{id_col}{Number or name of `mcol` that contains unique identifier for each peak. Default: 1.}
 
 \item{cons_score}{Annotation to use for getting the conservation scores. See \code{\link[GenomicScores]{gscores}}
 for details.}
@@ -36,6 +40,9 @@ See \code{\link[regioneR]{randomizeRegions}} for details.}
 
 \item{per.chromosome}{Logical indicating if the randomization should be performed along the same chromosome as
 the original set of peaks. See \code{\link[regioneR]{randomizeRegions}} for details.}
+
+\item{summarise}{Logaical indicating whether to summarise the results, computing the mean of all peaks at a specific
+position. Default: TRUE.}
 }
 \value{
 It returns a \code{data.frame} containing the summarized phastCons conservation scores for the file
