@@ -39,6 +39,7 @@ get_enhancer_clusters <- function(gr, n_sites=3, iterations=500, percentile=0.25
 
   # 2) Obtain percentile as cutoff - for each chromosome
   cutoff <- sapply(rndm_dist_chr, function(x) quantile(unlist(x), probs=percentile, na.rm=TRUE))
+  names(cutoff) <- names(rndm_dist_chr)
 
   # 3) Obtain distances betweeen enhancers
   distances <- split(interSiteDistances(gr), seqnames(gr))
@@ -64,11 +65,11 @@ get_enhancer_clusters <- function(gr, n_sites=3, iterations=500, percentile=0.25
   clusters <- unlist(GRangesList(clusters_list))
   clusters$clustID <- paste0("cluster_", 1:length(clusters))
 
-  metadata(clusters) <- list(params=c(min_sites=n_sites,
-                                      percentile=percentile,
-                                      iterations=iterations,
-                                      genome=genome,
-                                      chr_rm=rm),
+  metadata(clusters) <- list(params=list(min_sites=n_sites,
+                                         percentile=percentile,
+                                         iterations=iterations,
+                                         genome=genome,
+                                         chr_rm=rm),
                              thresholds=cutoff)
 
   return(clusters)
