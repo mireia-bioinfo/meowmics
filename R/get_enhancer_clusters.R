@@ -64,6 +64,13 @@ get_enhancer_clusters <- function(gr, n_sites=3, iterations=500, percentile=0.25
   clusters <- unlist(GRangesList(clusters_list))
   clusters$clustID <- paste0("cluster_", 1:length(clusters))
 
+  metadata(clusters) <- list(params=c(min_sites=n_sites,
+                                      percentile=percentile,
+                                      iterations=iterations,
+                                      genome=genome,
+                                      chr_rm=rm),
+                             thresholds=cutoff)
+
   return(clusters)
 }
 
