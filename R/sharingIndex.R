@@ -36,7 +36,8 @@ get_ranking_sharing_index <- function(peak_files,
   master$annotation <- "Distal"
   master$annotation[abs(master$distanceToTSS)<=2e3] <- "Promoter"
 
-  saveRDS(master, file=filename)
+  if(!is.NULL(filename)) saveRDS(master, file=filename)
+
   return(master)
 }
 
