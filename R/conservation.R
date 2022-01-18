@@ -30,6 +30,7 @@ get_conservation_scores <- function(peak_file,
                                     merge_fun="mean",
                                     random_control=TRUE,
                                     genome="hg38",
+                                    mask=NULL,
                                     per.chromosome=FALSE,
                                     summarise=TRUE) {
 
@@ -47,9 +48,6 @@ get_conservation_scores <- function(peak_file,
                                    summaryFun=merge_fun)
 
   if (random_control) {
-    gam <- regioneR::getGenomeAndMask(genome = genome, mask = NULL)
-    mask <- gam$genome[grep("_", GenomicRanges::seqnames(gam$genome)),]
-
     rndm <- regioneR::randomizeRegions(peaks,
                                        genome=genome,
                                        mask=mask,
