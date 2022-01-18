@@ -13,6 +13,7 @@ get_conservation_scores(
   merge_fun = "mean",
   random_control = TRUE,
   genome = "hg38",
+  mask = NULL,
   per.chromosome = FALSE,
   summarise = TRUE
 )

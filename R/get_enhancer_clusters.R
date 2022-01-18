@@ -7,6 +7,7 @@
 #' @param percentile Percentile of random distances to use for stitching peaks into the same cluster. Default: 0.25.
 #' @param genome Character indicating the name of the genome to use. Default: hg38.
 #' @param rm Names of chromosomes to remove. Default: chrX and chrY.
+#' @param nthreads Number of threads to use for the analysis.
 #' @export
 #' @details To define enhancer clusters, input sites are first randomized \code{iterations}
 #' times over the \code{genome} over idividual chromosomes). Then the \code{percentile}
@@ -21,7 +22,7 @@
 #'     \item{distance_cutoff}{Distance used as cutoff for including regions in the same cluster.}
 #' }
 get_enhancer_clusters <- function(gr, n_sites=3, iterations=500, percentile=0.25, genome="hg38",
-                                  rm=c("chrX", "chrY")) {
+                                  rm=c("chrX", "chrY"), nthreads=6) {
 
   if (is(gr, "character")) gr <- rtracklayer::import(gr)
 
@@ -35,7 +36,7 @@ get_enhancer_clusters <- function(gr, n_sites=3, iterations=500, percentile=0.25
                                                                                    genome=genome,
                                                                                    per.chromosome=TRUE,
                                                                                    allow.overlaps=FALSE)))
-  })
+  }, BPPARAM = BiocParallel::MulticoreParam(workers=nthreads))
 
   # 2) Obtain percentile as cutoff - for each chromosome
   cutoff <- sapply(rndm_dist_chr, function(x) quantile(unlist(x), probs=percentile, na.rm=TRUE))

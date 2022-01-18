@@ -10,7 +10,8 @@ get_enhancer_clusters(
   iterations = 500,
   percentile = 0.25,
   genome = "hg38",
-  rm = c("chrX", "chrY")
+  rm = c("chrX", "chrY"),
+  nthreads = 6
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ get_enhancer_clusters(
 \item{genome}{Character indicating the name of the genome to use. Default: hg38.}
 
 \item{rm}{Names of chromosomes to remove. Default: chrX and chrY.}
+
+\item{nthreads}{Number of threads to use for the analysis.}
 }
 \value{
 GRanges object containing the coordinates for the enhancer clusters
