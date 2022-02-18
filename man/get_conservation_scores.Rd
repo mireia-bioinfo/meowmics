@@ -10,6 +10,7 @@ get_conservation_scores(
   cons_score = phastCons7way.UCSC.hg38::phastCons7way.UCSC.hg38,
   bin_width = 20,
   window_width = 2000,
+  n_bins = NULL,
   merge_fun = "mean",
   random_control = TRUE,
   genome = "hg38",
@@ -21,15 +22,19 @@ get_conservation_scores(
 \arguments{
 \item{peak_file}{Path for the peak file or GRanges object.}
 
-\item{id_col}{Number or name of `mcol` that contains unique identifier for each peak. Default: 1.}
+\item{id_col}{Number or name of \code{mcol} that contains unique identifier for each peak. Default: 1.}
 
 \item{cons_score}{Annotation to use for getting the conservation scores. See \code{\link[GenomicScores]{gscores}}
 for details.}
 
-\item{bin_width}{Number of base pairs for binning the peak and obtaining the conservation scores. Default: 20}
+\item{bin_width}{Number of base pairs for binning the peak and obtaining the conservation scores.
+Ignored if the Fixed Number of Bins mode is activated (see Details). Default: 20}
 
 \item{window_width}{Number of base pairs of a window centered in the center of the peak where to focus the
-conservation analysis. Default = 2000}
+conservation analysis. Ignored if the Fixed Number of Bins mode is activated (see Details). Default = 2000}
+
+\item{n_bins}{Integer width the number of bins each region should be divided into. Giving it a value activates
+the Fixed Number of Bins mode (see Details).}
 
 \item{merge_fun}{Function for summarizing scores in the same region.}
 
@@ -53,4 +58,12 @@ is also returned.
 }
 \description{
 Given a peak set, this function obtains the mean conservation scores in the given window and bins.
+}
+\details{
+This function has two modes to calculate conservation scores in a set of regions: fixed window sizes (default)
+or fixed number of bins.
+\itemize{
+\item \strong{Fixed window sizes}. Regions are resized to be \code{window_width} and are then divided into \code{bin_width} bp bins.
+\item \strong{Fixed number of bins}. Regions are divided into \code{n_bins}, idependently of their size.
+}
 }

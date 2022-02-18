@@ -33,9 +33,9 @@ get_enhancer_clusters(
 GRanges object containing the coordinates for the enhancer clusters
 and the following mcols:
 \itemize{
-    \item{clustID}{Unique identifier for the enhancer cluster.}
-    \item{n_sites}{Number of sites in \code{gr} that are included in that specific cluster.}
-    \item{distance_cutoff}{Distance used as cutoff for including regions in the same cluster.}
+\item{clustID}{Unique identifier for the enhancer cluster.}
+\item{n_sites}{Number of sites in \code{gr} that are included in that specific cluster.}
+\item{distance_cutoff}{Distance used as cutoff for including regions in the same cluster.}
 }
 }
 \description{

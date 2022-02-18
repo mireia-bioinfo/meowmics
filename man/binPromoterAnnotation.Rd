@@ -24,8 +24,8 @@ either hg38 (default) or hg19.}
 
 \item{out_format}{Output format, either "saf" or "granges".}
 
-\item{genes}{Genes, as outputed by `obtainCodingGenes`, that is: a `GRanges`
-object with one `mcol` named `GeneID` which is a unique identifyer for the
+\item{genes}{Genes, as outputed by \code{obtainCodingGenes}, that is: a \code{GRanges}
+object with one \code{mcol} named \code{GeneID} which is a unique identifyer for the
 region.}
 }
 \value{
