@@ -41,9 +41,10 @@ get_conservation_scores <- function(peak_file,
                                     mask=NULL,
                                     per.chromosome=FALSE,
                                     summarise=TRUE) {
+  peaks <- regioneR::toGRanges(peak_file)
+
   if (is.null(n_bins)) {
     ## If same size windows + bins
-    peaks <- regioneR::toGRanges(peak_file)
     peaks <- GenomicRanges::resize(peaks, width=window_width, fix="center")
     peaks_bin <- GenomicRanges::tile(peaks, width=bin_width)
     pos <- seq(-window_width/2, window_width/2-1, by=bin_width)
@@ -81,7 +82,7 @@ get_conservation_scores <- function(peak_file,
       ## If fixed number of bins
       rndm_tile <- GenomicRanges::tile(rndm, n=n_bins)
       rndm_unl <- unlist(rndm_tile)
-      rndm_unl$id <- rep(paste0("sample_peak_", 1:length(rndm)), each=n_bins)
+      rndm_unl$id <- rep(paste0("random_peak_", 1:length(rndm)), each=n_bins)
       rndm_unl$pos <- rep(1:100, length(rndm_tile))
     }
 
