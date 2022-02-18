@@ -11,6 +11,7 @@ get_conservation_scores(
   bin_width = 20,
   window_width = 2000,
   n_bins = NULL,
+  n_bins_exp = 2,
   merge_fun = "mean",
   random_control = TRUE,
   genome = "hg38",
@@ -35,6 +36,9 @@ conservation analysis. Ignored if the Fixed Number of Bins mode is activated (se
 
 \item{n_bins}{Integer width the number of bins each region should be divided into. Giving it a value activates
 the Fixed Number of Bins mode (see Details).}
+
+\item{n_bins_exp}{If \code{n_bins} is set, factor by which to resize the input peaks. Default: 2
+(output region width = peak width * 2).}
 
 \item{merge_fun}{Function for summarizing scores in the same region.}
 

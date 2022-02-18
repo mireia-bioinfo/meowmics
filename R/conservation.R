@@ -11,6 +11,8 @@
 #' conservation analysis. Ignored if the Fixed Number of Bins mode is activated (see Details). Default = 2000
 #' @param n_bins Integer width the number of bins each region should be divided into. Giving it a value activates
 #' the Fixed Number of Bins mode (see Details).
+#' @param n_bins_exp If `n_bins` is set, factor by which to resize the input peaks. Default: 2
+#' (output region width = peak width * 2).
 #' @param merge_fun Function for summarizing scores in the same region.
 #' @param random_control Logical indicating whether to perform the same analysis using a randomized set of peaks
 #' as a control. Default = TRUE
@@ -35,6 +37,7 @@ get_conservation_scores <- function(peak_file,
                                     bin_width=20,
                                     window_width=2e3,
                                     n_bins=NULL,
+                                    n_bins_exp=2,
                                     merge_fun="mean",
                                     random_control=TRUE,
                                     genome="hg38",
@@ -54,7 +57,7 @@ get_conservation_scores <- function(peak_file,
     peaks_unl$pos <- rep(pos, length(peaks_bin))
   } else {
     ## If fixed number of bins
-    peaks_rsz <- GenomicRanges::resize(peaks, width=width(peaks)*1.5, fix="center")
+    peaks_rsz <- GenomicRanges::resize(peaks, width=width(peaks)*n_bins_exp, fix="center")
     peaks_tile <- GenomicRanges::tile(peaks_rsz, n=n_bins)
     peaks_unl <- unlist(peaks_tile)
     peaks_unl$id <- rep(paste0("sample_peak_", 1:length(peaks)), each=n_bins)
@@ -83,6 +86,8 @@ get_conservation_scores <- function(peak_file,
       )
 
     peaks_unl$pos <- rep(pos, length(peaks_tile))
+
+    peaks <- peaks_rsz
   }
 
   ## Get scores
