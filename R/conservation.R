@@ -54,10 +54,35 @@ get_conservation_scores <- function(peak_file,
     peaks_unl$pos <- rep(pos, length(peaks_bin))
   } else {
     ## If fixed number of bins
-    peaks_tile <- GenomicRanges::tile(peaks, n=n_bins)
+    peaks_rsz <- GenomicRanges::resize(peaks, width=width(peaks)*1.5, fix="center")
+    peaks_tile <- GenomicRanges::tile(peaks_rsz, n=n_bins)
     peaks_unl <- unlist(peaks_tile)
     peaks_unl$id <- rep(paste0("sample_peak_", 1:length(peaks)), each=n_bins)
-    peaks_unl$pos <- rep(1:100, length(peaks_tile))
+
+    # Identify start
+    starts <- queryHits(findOverlaps(peaks_unl, promoters(peaks, 0, 1)))
+    first <- !duplicated(peaks_unl$id[starts])
+    starts <- starts[first]
+
+    # Identify ends
+    ends <- queryHits(findOverlaps(peaks_unl, resize(peaks, 1, fix="end")))
+    last <- rev(!duplicated(peaks_unl$id[rev(ends)]))
+    ends <- ends[last]
+
+    bins_ini <- starts[1]-1
+    bins_end <- starts[2] - ends[1] - bins_ini
+
+    center <- seq(0, 1, length.out=unique(ends-starts+1))
+    prev <- seq(center[2]*bins_ini, center[2], length.out=bins_ini)
+    post <- seq(1+center[2], (1+center[2]*bins_end), length.out=bins_end-1)
+
+    pos <- c(
+      -prev,
+      center,
+      post
+      )
+
+    peaks_unl$pos <- rep(pos, length(peaks_tile))
   }
 
   ## Get scores
@@ -83,7 +108,7 @@ get_conservation_scores <- function(peak_file,
       rndm_tile <- GenomicRanges::tile(rndm, n=n_bins)
       rndm_unl <- unlist(rndm_tile)
       rndm_unl$id <- rep(paste0("random_peak_", 1:length(rndm)), each=n_bins)
-      rndm_unl$pos <- rep(1:100, length(rndm_tile))
+      rndm_unl$pos <- rep(pos, length(rndm_tile))
     }
 
     ## Get scores
