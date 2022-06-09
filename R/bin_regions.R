@@ -14,44 +14,35 @@ bin_regions_nbins <- function(gr,
                               n_bins=100,
                               n_bins_exp=2,
                               id_col="peakID") {
-  # Resize peaks to n_bins_exp
+  ## Resize peaks to n_bins_exp
   peaks_rsz <- GenomicRanges::resize(gr, width=width(gr)*n_bins_exp, fix="center")
 
-  # Divide in a fixed number of bins``
+  ## Divide in a fixed number of bins
   peaks_tile <- GenomicRanges::tile(peaks_rsz, n=n_bins)
-  peaks_unl <- unlist(peaks_tile)
-  peaks_unl$PeakID <- rep(mcols(gr)[,id_col], each=n_bins)
 
-  # Identify start
-  starts <- queryHits(findOverlaps(peaks_unl, promoters(gr, 0, 1)))
-  first <- !duplicated(peaks_unl$PeakID[starts])
-  starts <- starts[first]
+  ## Vector of positions
+  # Obtain bin values from first instance
+  bin_start <- queryHits(findOverlaps(peaks_tile[[1]], resize(gr[1], 1, fix="start")))
+  bin_end <- queryHits(findOverlaps(peaks_tile[[1]], resize(gr[1], 1, fix="end")))
+  pos_center <- seq(0, 1, length.out=bin_end-bin_start+1)
 
-  # Identify ends
-  ends <- queryHits(findOverlaps(peaks_unl, resize(gr, 1, fix="end")))
-  last <- rev(!duplicated(peaks_unl$PeakID[rev(ends)]))
-  ends <- ends[last]
+  # Value of each bin
+  unit <- pos_center[2]
 
-  # Position of start and end in vector
-  bins_ini <- starts[1]-1
-  bins_end <- starts[2] - ends[1] - bins_ini
+  # Value for bins upstream of peak
+  pos_prev <- rev(-unit * 1:(bin_start-1))
 
-  # Scales values to define start and end (center) and upstream and downstream
-  # positions
-  center <- seq(0, 1, length.out=unique(ends-starts+1)[1])
-  prev <- seq(center[2]*bins_ini, center[2], length.out=bins_ini)
-  post <- seq(1+center[2], (1+center[2]*bins_end), length.out=bins_end-1)
+  # Value for bins downstream of peak
+  pos_post <- 1 + unit * 1:(length((bin_end+1):n_bins))
 
-  # Final vector of positions
-  pos <- c(
-    -prev,
-    center,
-    post
-  )
+  # Vector of positions
+  pos <- c(pos_prev, pos_center, pos_post)
 
-  # Add position value
-  peaks_unl$pos <- rep(pos, length(peaks_tile))
-  peaks_unl$id_pos <- paste0(peaks_unl$PeakID, "_", peaks_unl$pos)
+  ## Create final GRanges
+  peaks_unl <- unlist(peaks_tile) %>%
+    plyranges::mutate(PeakID=rep(mcols(gr)[,id_col], each=n_bins),
+                      pos=rep(pos, length(gr)),
+                      id_pos=paste0(PeakID, "_", pos))
 
   return(peaks_unl)
 }
