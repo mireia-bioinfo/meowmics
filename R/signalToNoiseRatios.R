@@ -36,10 +36,12 @@ signalToNoiseRatio <- function(bam_file,
   if (is.null(genes)) genes <- obtainCodingGenes(build=build)
 
   ## TODO: Add distances in another variable
-  peaks$distanceToTSS <- mcols(distanceToNearest(peaks, promoters(genes, upstream=0, downstream=1),
-                                                 ignore.strand = TRUE))$distance
-  peaks$annotation <- "Promoter"
-  peaks$annotation[abs(peaks$distanceToTSS)>promoter_dist] <- "Distal"
+  dist <- distanceToNearest(peaks, promoters(genes, upstream=0, downstream=1),
+                            ignore.strand = TRUE)
+  peaks$distanceToTSS <- NA
+  peaks$distanceToTSS[queryHits(dist)] <- mcols(dist)$distance
+  peaks$annotation <- "Distal"
+  peaks$annotation[abs(peaks$distanceToTSS)<=promoter_dist] <- "Promoter"
 
   ## Convert to SAF
   peaks <- data.frame(peaks)
