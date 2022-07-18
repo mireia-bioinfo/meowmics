@@ -34,6 +34,8 @@ signalToNoiseRatio <- function(bam_file,
   if (length(unique(mcols(peaks)[,1]))!=length(peaks)) stop("First mcol should be a unique identifier.")
 
   if (is.null(genes)) genes <- obtainCodingGenes(build=build)
+
+  ## TODO: Add distances in another variable
   peaks$distanceToTSS <- mcols(distanceToNearest(peaks, promoters(genes, upstream=0, downstream=1),
                                                  ignore.strand = TRUE))$distance
   peaks$annotation <- "Promoter"
@@ -76,9 +78,9 @@ signalToNoiseRatio <- function(bam_file,
 obtainCodingGenes <- function(build="hg38") {
   ## Select build
   if(tolower(build) %in% c("hg19", "grch37")) {
-    host <- "grch37.ensembl.org"
+    host <- "https://grch37.ensembl.org"
   } else if (tolower(build) %in% c("hg38", "grch38")) {
-    host <- "www.ensembl.org"
+    host <- "https://www.ensembl.org"
   } else {
     stop("Build not recognized. Choose from hg19 or hg38.")
   }
