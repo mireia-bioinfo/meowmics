@@ -36,12 +36,12 @@ bin_regions_nbins <- function(gr,
   pos_post <- 1 + unit * 1:(length((bin_end+1):n_bins))
 
   # Vector of positions
-  pos <- c(pos_prev, pos_center, pos_post)
+  pos_vector <- c(pos_prev, pos_center, pos_post)
 
   ## Create final GRanges
   peaks_unl <- unlist(peaks_tile) %>%
     plyranges::mutate(PeakID=rep(mcols(gr)[,id_col], each=n_bins),
-                      pos=rep(pos, length(gr)),
+                      pos=rep(pos_vector, length(gr)),
                       id_pos=paste0(PeakID, "_", pos))
 
   return(peaks_unl)
