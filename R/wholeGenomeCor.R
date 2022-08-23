@@ -16,16 +16,28 @@ wholeGenomeCor <- function(bam_files,
   ## Obtain binned genome
   genome_bins <- binGenome(chr_sizes, bin_size, out_type="saf")
 
+  ## Split files in case PE and SE merged
+  bam_split <- split(bam_files, paired_end)
+
   ## Count reads for each window
-  counts <- Rsubread::featureCounts(bam_files,
-                                    annot.ext = genome_bins,
-                                    allowMultiOverlap = TRUE,
-                                    nthreads = nthreads,
-                                    isPairedEnd = paired_end)
-  colnames(counts$counts) <- gsub(suffix, "", colnames(counts$counts))
+  counts_list <- lapply(1:length(bam_split), function(i) {
+    paired <- ifelse(names(bam_split)[i] == "TRUE" |
+                       names(bam_split)[i] == "PE",
+                     TRUE, FALSE)
+
+    counts <- Rsubread::featureCounts(bam_files,
+                                      annot.ext = genome_bins,
+                                      allowMultiOverlap = TRUE,
+                                      nthreads = nthreads,
+                                      isPairedEnd = paired_end)
+    colnames(counts$counts) <- gsub(suffix, "", colnames(counts$counts))
+    counts$counts
+  })
+
+  counts <- do.call(cbind, counts_list)
 
   ## Obtain correlation matrix
-  cormat <- cor(counts$counts)
+  cormat <- cor(counts)
 
   ## Return correlation matrix
   return(cormat)
