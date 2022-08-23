@@ -75,9 +75,9 @@ binPromoterAnnotation <- function(scope=2e3,
                                   genes=NULL) {
   ## Select build
   if(tolower(build) %in% c("hg19", "grch37")) {
-    host <- "grch37.ensembl.org"
+    host <- "https://grch37.ensembl.org"
   } else if (tolower(build) %in% c("hg38", "grch38")) {
-    host <- "www.ensembl.org"
+    host <- "https://www.ensembl.org"
   } else {
     stop("Build not recognized. Choose from hg19 or hg38.")
   }
