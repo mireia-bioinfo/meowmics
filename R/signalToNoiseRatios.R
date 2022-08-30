@@ -60,8 +60,8 @@ signalToNoiseRatio <- function(bam_file,
   sum <- anno %>%
     dplyr::group_by(Annotation) %>%
     dplyr::summarise(reads=sum(reads))
-  sum[3,1] <- "Unassigned"
-  sum[3,2] <- sum(counts$stat[grepl("Unas", counts$stat$Status),2])
+  sum[nrow(sum)+1,1] <- "Unassigned"
+  sum[nrow(sum),2] <- sum(counts$stat[grepl("Unas", counts$stat$Status),2])
 
   sum$percentage <- sum$reads / sum(sum$reads) * 100
 
