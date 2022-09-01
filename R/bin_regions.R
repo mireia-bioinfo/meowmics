@@ -42,7 +42,9 @@ bin_regions_nbins <- function(gr,
   peaks_unl <- unlist(peaks_tile) %>%
     plyranges::mutate(PeakID=rep(mcols(gr)[,id_col], each=n_bins),
                       pos=rep(pos_vector, length(gr)),
-                      id_pos=paste0(PeakID, "_", pos))
+                      id_pos=paste0(PeakID, "_", pos)) %>%
+    plyranges::filter(start > 0 & end > 0) %>% ## Remove - bins
+    plyranges::mutate(start = ifelse(start < 1, 1, start)) ## Resize bins outside scope
 
   return(peaks_unl)
 }
