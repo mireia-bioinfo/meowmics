@@ -169,7 +169,8 @@ get_overlaps_sign <- function(gr_list, master, perc_overlap=0.4) {
 #' @import ggplot2
 #' @export
 plot_ranking_sharing_index <- function(master,
-                                       plot_title) {
+                                       plot_title,
+                                       theme=theme_classic()) {
 
   if(is.character(master)) master <- readRDS(master)
 
@@ -190,6 +191,7 @@ plot_ranking_sharing_index <- function(master,
     viridis::scale_fill_viridis(discrete=T, direction=-1, option="D") +
     scale_y_continuous(labels=function(x) scales::comma(x), name="# of peaks") +
     facet_wrap(~annotation) +
+    theme +
     theme(legend.position="none",
           panel.grid.major.y=element_line(size=.25, linetype=1, color="dark grey"),
           panel.grid.minor.y=element_line(size=.25, linetype=2, color="grey"),
@@ -212,6 +214,7 @@ plot_ranking_sharing_index <- function(master,
                     name="Rank index (RI)") +
     xlab("Sharing index (SI)") +
     facet_wrap(~annotation) +
+    theme +
     theme(legend.position="none",
           strip.text = element_blank(),
           strip.background = element_blank())
