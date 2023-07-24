@@ -47,6 +47,8 @@ get_enhancer_clusters <- function(gr, n_sites=3, iterations=500, percentile=0.25
 
   # 4) Create clusters while distances are shorter than cutoff
   clusters_list <- BiocParallel::bplapply(1:(length(distances)-1), function(i) {
+    tictoc::tic(paste0("Started", names(distances)[i]))
+
     cluster <- cumsum(c(1, as.numeric(!(distances[[i]] < cutoff[[i]]))))
     gr_clust <- split(gr[seqnames(gr)==unique(seqnames(gr))[i]], cluster)
     num_sites <- sapply(gr_clust, length)
@@ -59,7 +61,13 @@ get_enhancer_clusters <- function(gr, n_sites=3, iterations=500, percentile=0.25
     )
     clusters <- unlist(GRangesList(clusters))
     clusters$n_sites <- num_sites[num_sites>=n_sites]
-    clusters$distance_cutoff <- cutoff[[i]]
+    if (length(clusters)>0) {
+      clusters$distance_cutoff <- cutoff[[i]]
+      } else {
+        clusters$distance_cutoff <- integer(0)
+      }
+
+    tictoc::toc()
     clusters
   })
 
